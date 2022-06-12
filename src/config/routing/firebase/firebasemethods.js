@@ -1,34 +1,30 @@
 import { getAuth,createUserWithEmailAndPassword , signInWithEmailAndPassword , signOut , onAuthStateChanged } 
 from "firebase/auth";
+import app from './firebaseconfig';
+import { getDatabase , ref, set, onValue  } from "firebase/database";
 
-
-import app from "../firebase/firebaseconfig"
-// authentication methods
+// == authentication methods == 
 const auth = getAuth(app);
-// const value = {
-//     currentUser , 
-//     login , 
-//     signup , 
-//     logout 
-//   }
 
-let signupUser = (obj) => {
-//const {email , password} = obj
-
-return createUserWithEmailAndPassword(auth,obj.email,obj. password)
+const signUpUser = async (obj) => {
+   try {
+        return await createUserWithEmailAndPassword(auth, obj.email, obj.password);
+    } catch (error) {
+        // TODO: Notify user about error
+        var errorCode = error.code;
+        var errorMessage = error.message;
+        console.log(errorCode);
+        console.log(errorMessage);
+    }
 }
-let loginUser = (obj) => {
-
-    return signInWithEmailAndPassword(auth,obj.email,obj. password)
-
-
+const loginUser = (obj) => {
+   return signInWithEmailAndPassword(auth, obj.email, obj.password)
+  
 }
-let logoutUser = () => {
-
-    return signOut(auth) ; 
-
+const logoutUser = () => {
+    // return signOut(auth) ; 
 }
-let checkauthUser = () => {
+const checkauthUser = () => {
   
     // onAuthStateChanged(auth, (user) => {
     //     if (user) {
@@ -45,6 +41,33 @@ let checkauthUser = () => {
 
 }
 
+// == Database methods ==
+const database = getDatabase();
+let sendData=(obj, nodeName, id)=>{
 
- export {signupUser , loginUser , logoutUser , checkauthUser}; 
+    let reference = ref(database, `${nodeName}/${id ? id : ''}`);
+
+    return set(reference, obj);
+
+}
+let getData=(nodeName)=>{
+    const dbRef = ref(database,nodeName);
+    const arr = [];
+     onValue(dbRef, (snapshot) => {
+        snapshot.forEach((childSnapshot) => {
+          const childKey = childSnapshot.key;
+          const childData = childSnapshot.val();
+          console.log(childData);
+          arr.push(childData);
+          
+        });
+        return arr;
+      }, {
+        onlyOnce: true
+      });
+      
+}
+
+
+ export {signUpUser , loginUser , logoutUser , checkauthUser, sendData, getData}; 
 

@@ -18,6 +18,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import AccountCircleRoundedIcon from '@mui/icons-material/AccountCircleRounded';
 import { useState } from 'react';
+import { useEffect } from 'react';
+import { getData } from '../config/routing/firebase/firebasemethods';
 
 
 const drawerWidth = 240;
@@ -28,6 +30,13 @@ function Dashboard(props) {
   const [username, setUsername] = useState("");
 const obj = {username};
 const navigate = useNavigate();
+useEffect(()=>{
+  if(params.id){
+    getData('users')
+  }
+})
+
+
 const dashboard = () =>{
   navigate(`/dashboard/${username}`, {state: obj});
   }

@@ -1,20 +1,44 @@
-import React from "react";
+import React, { useState } from "react";
 import './loginsignup.css'
 import TextField from '@mui/material/TextField';
-import Button from '@mui/material/Button';
 import { Typography } from "@mui/material";
 import { useNavigate } from 'react-router-dom';
+import HButton from './../components/button';
+import { loginUser } from "../config/routing/firebase/firebasemethods";
+import HInput from './../components/input';
 
 
 function Login(){
     const navigate = useNavigate();
+    const[userObj, setUserObj] = useState({});
+    const[loader, setLoader] = useState(false);
 
-    const gotoDash = () =>{
-            navigate(`/dashboard`);
-            }
     const gotoReg = () =>{
             navigate(`/`);
             }
+    const gotoDash = () =>{
+        if(!userObj.email){
+            return alert("Email is required ! ") ;
+        }
+        if(!userObj.password ){
+            return alert ( "Pasword is required !");
+        }
+        console.log(userObj);
+                    
+        setLoader(true);
+        loginUser(userObj)
+        .then ((success) => {
+            console.log("Logged in successfully!");
+            setLoader(false);
+            navigate(`/dashboard${success.user.uid}`)
+        }) 
+        .catch((err)=>{
+            console.log(err);
+            console.log("Error occur");   
+            setLoader(false);
+        }) ;
+    }
+            
     return(
         <> 
         <div className="outer-container">
@@ -25,26 +49,19 @@ function Login(){
            </div>
            <div className="container">
            <div className="inp">
-           <TextField
-           color="warning"
-            id="standard-basic" 
-            label="Username or Email" 
-            variant="standard" />
-           <TextField
-           color="warning"
-          id="standard-password-input"
-          label="Password"
-          type="password"
-          autoComplete="current-password"
-          variant="standard"
-        />
+           <HInput label="Email" type="email" onChange={(e) =>
+                setUserObj({ ...userObj, email: e.target.value })}/>
+          
+          <HInput label="Password" type="password" onChange={(e) =>
+                setUserObj({ ...userObj, password: e.target.value })}/>
+          
            </div>
            <div className="forget typography">  <Typography color="gray" variant="caption">Forgotten your password?</Typography></div>
            <div className="button">
-           <Button className="btn" variant="contained"  onClick={gotoDash}>Login</Button>
+           <HButton loading={loader} label="Login" onClick={gotoDash}/>
            </div>
            <div className="loginBottom typography">
-               <Typography color="gray" variant="caption">Don't have an account? <a onClick={gotoReg} href="/signup">Sign Up</a></Typography>
+               <Typography color="gray" variant="caption">Don't have an account? <a onClick={gotoReg} >Sign Up</a></Typography>
                
                </div>
                </div>

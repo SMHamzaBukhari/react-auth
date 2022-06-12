@@ -12,7 +12,7 @@ export default function Routing() {
   return (
     <Router>
         <Routes>
-        <Route path='/dashboard' element={<Dashboard/>} ></Route>
+        <Route path='/dashboard:id' element={<Dashboard/>} ></Route>
           <Route path="/login" element={<Login/>}/>
           <Route path="/" element={<Signup/>}/>
         </Routes>
